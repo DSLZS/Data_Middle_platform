@@ -14,4 +14,5 @@
 | maxspeed_backward | integer | 反向限速 |
 | priority | double precision | 路由优先级 |
 | geom | geometry(LineString,4326) | 路段几何线 |
+
 用途：哈尔滨城市路网拓扑数据，描述道路路段及其连接关系，是路径规划和地图匹配的基础路网。
