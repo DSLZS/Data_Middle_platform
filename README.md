@@ -65,11 +65,11 @@
 
 用途：道路与节点的多对多关系映射。
 ### 6. 其他辅助表
-users — OSM 用户信息
-relations — OSM 关系数据
-relation_members — 关系成员
-schema_info — 数据库版本信息
-temp_ways — 临时道路表
+users — OSM 用户信息  
+relations — OSM 关系数据  
+relation_members — 关系成员  
+schema_info — 数据库版本信息  
+temp_ways — 临时道路表  
 ## 表之间的血缘关系
 ```mermaid
 erDiagram
@@ -94,3 +94,8 @@ erDiagram
 nodes ←→ bfmap_ways：路段的起点/终点由节点构成
 bfmap_ways → trips：轨迹数据通过 roads/route 字段关联到路段
 nodes → way_nodes → ways：OSM 原始道路的节点序列
+## 数据建模方案（DWD → DWM → DWS）
+原始数据已经是宽表形态（trips 表把所有 GPS 点、道路匹配结果都塞在数组里），需要：  
+DWD 层：将数组炸开，还原为逐条/逐点的明细事实表  
+DWM 层：按天/按车做轻度聚合，保留明细特征  
+DWS 层：按维度（车、日、路段、时段）做多维度汇总  
