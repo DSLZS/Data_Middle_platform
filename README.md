@@ -71,22 +71,26 @@ relation_members — 关系成员
 schema_info — 数据库版本信息
 temp_ways — 临时道路表
 ## 表之间的血缘关系
-┌─────────────┐     source/target      ┌──────────────┐
-│   nodes     │◄─────────────────────►│  bfmap_ways   │
-│ (节点坐标)  │                        │ (路段拓扑)   │
-└─────────────┘                        └──────┬───────┘
-                                              │ gid
-                                              │ roads / route
-                                              ▼
-                                       ┌──────────────┐
-                                       │    trips     │
-                                       │ (出租车轨迹) │
-                                       └──────────────┘
+```mermaid
+erDiagram
+    nodes {
+        bigint id PK
+        geometry geom
+    }
+    bfmap_ways {
+        bigint gid PK
+        bigint source FK
+        bigint target FK
+    }
+    trips {
+        text file_name
+        integer[] roads
+        integer[] route
+    }
 
-┌─────────────┐     way_nodes     ┌──────────────┐
-│   nodes     │◄─────────────────►│    ways      │
-│             │                   │ (OSM道路原始)│
-└─────────────┘                   └──────────────┘
+    nodes ||--o{ bfmap_ways : "source/target"
+    bfmap_ways ||--o{ trips : "gid / roads/route"
+```
 nodes ←→ bfmap_ways：路段的起点/终点由节点构成
 bfmap_ways → trips：轨迹数据通过 roads/route 字段关联到路段
 nodes → way_nodes → ways：OSM 原始道路的节点序列
