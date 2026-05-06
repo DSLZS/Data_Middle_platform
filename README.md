@@ -139,71 +139,70 @@ nodes → way_nodes → ways：OSM 原始道路的节点序列
 ## 表之间的血缘关系
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                      ODS 层 (原始表)                             │
-│  trips (~35万行)  │  bfmap_ways (2049行)  │  nodes / users ...  │
+│                      ODS 层 (原始表)                              │
 └────────┬──────────┬───────────────────┬────────────────────────┘
          │          │                   │
          ▼          ▼                   ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                      DIM 层 (静态维度)                            │
 │                                                                 │
-│  generate_series(2015全年) ──→ dim_date                         │
-│  bfmap_ways ──映射(class_name退化)──→ dim_road_segment           │
-│  dwd_taxi_trip ──提取标签──→ dim_taxi                            │
+│  generate_series(2015全年) ──→ dim_date                          │
+│  bfmap_ways ──映射(class_name退化)──→ dim_road_segment            │
+│  dwd_taxi_trip ──提取标签──→ dim_taxi                             │
 └─────────────────────────────────────────────────────────────────┘
          │
          ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    DWD 层 (明细层 — 不做聚合)                      │
 │                                                                 │
-│  trips ──解析数组──→ dwd_taxi_trip (行程主表)                    │
+│  trips ──解析数组──→ dwd_taxi_trip (行程主表)                      │
 │            ├─ 展开 lon/lat/tms ──→ dwd_taxi_gps_point            │
 │            ├─ 展开 roads/frac/time ──→ dwd_taxi_road_segment     │
 │            │         └─ 关联 dim_road_segment (维度退化)           │
-│            └─ 关联 dim_road_segment (子查询计算总距离)             │
+│            └─ 关联 dim_road_segment (子查询计算总距离)              │
 │                                                                 │
-│  维度退化字段 (dwd_taxi_road_segment):                           │
-│    road_class_id, road_class_name, road_length_m,                │
-│    maxspeed_forward, source_node, target_node                     │
+│  维度退化字段 (dwd_taxi_road_segment)：                            │
+│    road_class_id, road_class_name, road_length_m,               │
+│    maxspeed_forward, source_node, target_node                   │
 └────────┬──────────┬──────────┬─────────────────────────────────┘
          │          │          │
          ▼          ▼          ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                   DWM 层 (轻度聚合 — 按主题)                       │
 │                                                                 │
-│  dwd_taxi_trip + gps_point + road_segment                      │
-│       ── GROUP BY devid, trip_date ──→ dwm_taxi_daily_stats    │
+│  dwd_taxi_trip + gps_point + road_segment                       │
+│       ── GROUP BY devid, trip_date ──→ dwm_taxi_daily_stats     │
 │                                                                 │
-│  dwd_taxi_road_segment (已含维度退化)                            │
-│       ── GROUP BY road_id, trip_date ──→ dwm_road_segment_daily│
+│  dwd_taxi_road_segment (已含维度退化)                             │
+│       ── GROUP BY road_id, trip_date ──→ dwm_road_segment_daily │
 │                                                                 │
-│  dwd_taxi_trip + road_segment (首段 seq=1, 尾段 seq=MAX)        │
-│       ── GROUP BY origin, dest, trip_date ──→ dwm_od_flow_daily│
+│  dwd_taxi_trip + road_segment (首段 seq=1, 尾段 seq=MAX)         │
+│       ── GROUP BY origin, dest, trip_date ──→ dwm_od_flow_daily │
 │                                                                 │
-│  dwd_taxi_road_segment (已含维度退化)                            │
-│       ── GROUP BY road_id, trip_date, hour ──→ dwm_road_hourly │
+│  dwd_taxi_road_segment (已含维度退化)                             │
+│       ── GROUP BY road_id, trip_date, hour ──→ dwm_road_hourly  │
 │                                                  _speed         │
 └────────┬──────────┬──────────┬─────────────────────────────────┘
          │          │          │
          ▼          ▼          ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                   DWS 层 (宽表 — 面向分析)                        │
+│                   DWS 层 (宽表 — 面向分析)                         │
 │                                                                 │
-│  dwm_taxi_daily_stats                                          │
-│       ── GROUP BY stat_date ──→ dws_taxi_overview              │
+│  dwm_taxi_daily_stats                                           │
+│       ── GROUP BY stat_date ──→ dws_taxi_overview               │
 │                                                                 │
-│  dwm_road_hourly_speed                                         │
-│       ── GROUP BY stat_date, stat_hour ──→ dws_road_traffic    │
+│  dwm_road_hourly_speed                                          │
+│       ── GROUP BY stat_date, stat_hour ──→ dws_road_traffic     │
 │                                                                 │
-│  dwm_taxi_daily_stats + dwm_od_flow_daily                      │
-│       ── GROUP BY YYYY-MM ──→ dws_city_traffic_monthly         │
+│  dwm_taxi_daily_stats + dwm_od_flow_daily                       │
+│       ── GROUP BY YYYY-MM ──→ dws_city_traffic_monthly          │
 │                                                                 │
-│  dwd_taxi_road_segment (直接从 DWD 取, 不经过 DWM)              │
-│       ── GROUP BY trip_date, class_id ──→ dws_road_class_      │
+│  dwd_taxi_road_segment (直接从 DWD 取, 不经过 DWM)                 │
+│       ── GROUP BY trip_date, class_id ──→ dws_road_class_       │
 │                                              analysis           │
 │                                                                 │
-│  dwm_road_segment_daily + dim_road_segment                     │
-│       ── 每路段判断 ──→ dws_hotspot_analysis                   │
+│  dwm_road_segment_daily + dim_road_segment                      │
+│       ── 每路段判断 ──→ dws_hotspot_analysis                      │
 └─────────────────────────────────────────────────────────────────┘
 
 ```
