@@ -10,7 +10,7 @@
 
     <name>dmp</name>
     <url>http://www.dmp.vip</url>
-    <description>若依管理系统</description>
+    <description>交通运行态势感知与治理决策中台</description>
     
     <properties>
         <dmp.version>3.8.9</dmp.version>

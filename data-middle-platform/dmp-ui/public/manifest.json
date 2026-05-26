@@ -1,7 +1,7 @@
 {
-  "name": "若依管理系统",
+  "name": "交通运行态势感知与治理决策中台",
   "short_name": "若依",
-  "description": "若依管理系统",
+  "description": "交通运行态势感知与治理决策中台",
   "background_color": "#fff",
   "display": "standalone",
   "orientation": "portrait",
