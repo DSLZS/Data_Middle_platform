@@ -3,7 +3,7 @@
 -- 说明: 静态路网数据, 不随业务变化
 --       class_id → class_name 退化, 提取起终点经纬度
 -- ────────────────────────────────────────────────────────────
-DROP TABLE IF EXISTS dim_road_segment;
+-- DROP TABLE IF EXISTS dim_road_segment;
 CREATE TABLE dim_road_segment (
       road_id            BIGINT PRIMARY KEY,
       osm_id             BIGINT,

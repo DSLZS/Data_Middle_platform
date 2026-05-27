@@ -34,7 +34,7 @@ SELECT
         END
 FROM trips t
          JOIN dwd_taxi_trip tr ON t.devid = tr.devid AND t.file_name = tr.file_name
-         JOIN _seq s ON s.n <= arr_len(t.tms)
+         JOIN seq s ON s.n <= arr_len(t.tms)
 WHERE t.devid IS NOT NULL
   AND t.tms IS NOT NULL
   AND TRIM(t.tms) != ''

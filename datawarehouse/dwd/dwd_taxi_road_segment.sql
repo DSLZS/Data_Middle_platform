@@ -41,7 +41,7 @@ SELECT
     rc.source_node_id, rc.target_node_id, rc.maxspeed_forward
 FROM trips t
          JOIN dwd_taxi_trip tr ON t.devid = tr.devid AND t.file_name = tr.file_name
-         JOIN _seq s ON s.n <= arr_len(t.roads)
+         JOIN seq s ON s.n <= arr_len(t.roads)
          LEFT JOIN dim_road_segment rc ON rc.road_id = (arr_get(t.roads, s.n) + 0)
 WHERE t.devid IS NOT NULL
   AND t.tms IS NOT NULL

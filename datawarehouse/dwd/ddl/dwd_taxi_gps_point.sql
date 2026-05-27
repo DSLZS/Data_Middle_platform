@@ -5,7 +5,7 @@
 -- 不做聚合, 只做数组展开 + 衍生字段计算
 -- 维度退化: 关联 dim_road_segment 获取 class_name
 -- ────────────────────────────────────────────────────────────
-DROP TABLE IF EXISTS dwd_taxi_gps_point;
+-- DROP TABLE IF EXISTS dwd_taxi_gps_point;
 CREATE TABLE dwd_taxi_gps_point (
     trip_id       BIGINT,
     devid         VARCHAR(50),

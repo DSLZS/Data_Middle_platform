@@ -23,7 +23,7 @@ SELECT
     arr_len(t.roads),
     -- 维度退化: 关联 dim_road_segment, 用 frac × length 计算总距离 (子查询, 非聚合)
     (SELECT SUM(rc.length_m * (arr_get(t.frac, s.n) + 0))
-     FROM _seq s
+     FROM seq s
               JOIN dim_road_segment rc ON rc.road_id = (arr_get(t.roads, s.n) + 0)
      WHERE s.n <= arr_len(t.roads)),
     TIMESTAMPDIFF(SECOND,
