@@ -4,7 +4,7 @@
 -- 粒度: 一天一个路段, 含热点判断标签
 -- 分析场景: 拥堵热点识别、流量热点发现
 -- ────────────────────────────────────────────────────────────
-DROP TABLE IF EXISTS dws_hotspot_analysis;
+-- DROP TABLE IF EXISTS dws_hotspot_analysis;
 CREATE TABLE dws_hotspot_analysis (
     stat_date        DATE,
     road_id          BIGINT,

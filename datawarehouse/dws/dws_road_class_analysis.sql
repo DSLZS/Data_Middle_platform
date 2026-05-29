@@ -9,7 +9,9 @@ INSERT INTO dws_road_class_analysis (
     avg_speed_kmh, congestion_level, avg_length_m
 )
 SELECT
-    rs.trip_date, rs.road_class_id, rs.road_class_name,
+    rs.trip_date,
+    rs.road_class_id,
+    rs.road_class_name,
     COUNT(DISTINCT rs.road_id),
     COUNT(*),
     AVG(CASE WHEN rs.segment_speed > 0 AND rs.segment_speed < 200 THEN rs.segment_speed END),
@@ -17,11 +19,13 @@ SELECT
         / NULLIF(AVG(rs.maxspeed_forward), 0),
     AVG(rs.road_length_m)
 FROM dwd_taxi_road_segment rs
+WHERE rs.road_class_id IS NOT NULL
+  AND rs.road_class_name IS NOT NULL
 GROUP BY rs.trip_date, rs.road_class_id, rs.road_class_name
     ON DUPLICATE KEY UPDATE
-        road_count       = VALUES(road_count),
-        total_pass       = VALUES(total_pass),
-        avg_speed_kmh    = VALUES(avg_speed_kmh),
-        congestion_level = VALUES(congestion_level),
-        avg_length_m     = VALUES(avg_length_m),
-        etl_date         = CURDATE();
+     road_count = VALUES(road_count),
+     total_pass = VALUES(total_pass),
+     avg_speed_kmh = VALUES(avg_speed_kmh),
+     congestion_level = VALUES(congestion_level),
+     avg_length_m = VALUES(avg_length_m),
+     etl_date = CURDATE();

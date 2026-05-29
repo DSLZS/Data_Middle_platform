@@ -4,7 +4,7 @@
 -- 粒度: 一天一个道路等级
 -- 分析场景: 不同等级道路的通行效率对比
 -- ────────────────────────────────────────────────────────────
-DROP TABLE IF EXISTS dws_road_class_analysis;
+-- DROP TABLE IF EXISTS dws_road_class_analysis;
 CREATE TABLE dws_road_class_analysis (
      stat_date        DATE,
      class_id         INT,

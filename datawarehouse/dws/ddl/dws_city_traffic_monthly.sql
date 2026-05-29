@@ -4,7 +4,7 @@
 -- 粒度: 一月一行, 城市级月度指标
 -- 分析场景: 月度趋势分析、环比对比
 -- ────────────────────────────────────────────────────────────
-DROP TABLE IF EXISTS dws_city_traffic_monthly;
+-- DROP TABLE IF EXISTS dws_city_traffic_monthly;
 CREATE TABLE dws_city_traffic_monthly (
     stat_month             VARCHAR(7) PRIMARY KEY,
     active_taxis           INT,
