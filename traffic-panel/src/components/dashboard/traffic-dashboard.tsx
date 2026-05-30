@@ -131,7 +131,7 @@ export function TrafficDashboard() {
         fetchApi<TimelinePoint[]>("/api/timeline"),
         fetchApi<Hotspot[]>("/api/hotspots"),
         fetchApi<CongestedRoad[]>("/api/congested-roads"),
-        fetchApi<Trip[]>("/api/trips?limit=8"),
+        fetchApi<Trip[]>("/api/trips?limit=16"),
         fetchApi<MapLayers>("/api/map-layers"),
         fetchApi<RoadClassStat[]>("/api/road-classes"),
       ]);
@@ -233,6 +233,8 @@ export function TrafficDashboard() {
     [state.hotspots],
   );
 
+  const timelineTickInterval = Math.max(0, Math.ceil(state.timeline.length / 12) - 1);
+
   const metricCards = [
     {
       label: "活跃车辆数",
@@ -241,7 +243,7 @@ export function TrafficDashboard() {
       icon: CarTaxiFront,
     },
     {
-      label: "采样轨迹数",
+      label: "总采样轨迹",
       value: state.overview.totalTrips,
       unit: "条",
       icon: GitBranch,
@@ -277,7 +279,7 @@ export function TrafficDashboard() {
       icon: Flame,
     },
     {
-      label: "采样轨迹",
+      label: "复盘样本",
       value: state.trips.length,
       unit: "条",
       icon: Navigation,
@@ -305,7 +307,7 @@ export function TrafficDashboard() {
             <DonutChart
               data={statusData}
               colors={ringColors}
-              centerLabel="轨迹总数"
+              centerLabel="复盘样本"
               centerValue={state.trips.length}
               mounted={mounted}
             />
@@ -340,7 +342,7 @@ export function TrafficDashboard() {
           </Panel>
         </section>
 
-        <Panel title="趋势图" icon={TrendingUp} action="按小时活跃车辆">
+        <Panel title="趋势图" icon={TrendingUp} action="最近24个小时点">
           <div className="h-[280px]">
             {mounted ? (
               <MeasuredChart>
@@ -353,10 +355,10 @@ export function TrafficDashboard() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid stroke="rgba(125, 211, 252, 0.08)" vertical={false} />
-                  <XAxis dataKey="hour" tick={{ fill: "#7dbbd0", fontSize: 12 }} interval={1} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="hour" tick={{ fill: "#7dbbd0", fontSize: 12 }} interval={timelineTickInterval} axisLine={false} tickLine={false} />
                   <YAxis hide />
                   <ChartTooltip content={<ChartTip />} />
-                  <Area type="monotone" dataKey="activeVehicles" stroke="#22e6f5" strokeWidth={3} fill="url(#trafficTrend)" dot={{ r: 4, fill: "#22e6f5" }} />
+                  <Area type="monotone" dataKey="activeVehicles" name="覆盖路段" stroke="#22e6f5" strokeWidth={3} fill="url(#trafficTrend)" dot={{ r: 4, fill: "#22e6f5" }} />
                 </AreaChart>
                 )}
               </MeasuredChart>

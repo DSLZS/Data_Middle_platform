@@ -107,18 +107,20 @@ export async function getOverview() {
 export async function getTimeline() {
   return resilient(
     () =>
-      cachedJson("timeline:v1", 600, async () => {
+      cachedJson("timeline:v2", 600, async () => {
         const rows = await queryRows<RoadTrafficRow>(`
           SELECT stat_date, stat_hour, total_roads, avg_congestion, congested_roads, smooth_roads, avg_speed_kmh
           FROM dws_road_traffic
-          WHERE stat_date = (SELECT MAX(stat_date) FROM dws_road_traffic)
-          ORDER BY stat_hour
+          ORDER BY stat_date DESC, stat_hour DESC
           LIMIT 24
         `);
         if (!rows.length) return fallbackTimeline;
 
-        return rows.map((row) => ({
-          hour: `${String(row.stat_hour).padStart(2, "0")}:00`,
+        const timelineRows = [...rows].reverse();
+        const hasMultipleDates = new Set(timelineRows.map((row) => row.stat_date)).size > 1;
+
+        return timelineRows.map((row) => ({
+          hour: formatTimelineHour(row.stat_date, row.stat_hour, hasMultipleDates),
           activeVehicles: Math.max(1, cleanNumber(row.total_roads, 5)),
           avgSpeed: round(cleanNumber(row.avg_speed_kmh, fallbackOverview.avgSpeedKmh), 2),
           congestion: normalizeCongestion(row.avg_congestion, row.congested_roads, row.total_roads),
@@ -206,8 +208,8 @@ export async function getRoadClasses() {
   );
 }
 
-export async function getTrips(limit = 8) {
-  const safeLimit = clampLimit(limit, 12);
+export async function getTrips(limit = 16) {
+  const safeLimit = clampLimit(limit, 30);
   return resilient(
     () =>
       cachedJson(`trips:v1:${safeLimit}`, 1800, async () => {
@@ -231,10 +233,10 @@ export async function getTrips(limit = 8) {
 export async function getMapLayers() {
   return resilient(
     () =>
-      cachedJson("map-layers:v1", 900, async () => {
+      cachedJson("map-layers:v2", 900, async () => {
         const [hotspotsResult, tripsResult] = await Promise.all([
           getHotspots(12),
-          getTrips(8),
+          getTrips(16),
         ]);
         const hotspots = hotspotsResult.data;
         const trips = tripsResult.data;
@@ -393,4 +395,15 @@ function formatTripTime(tripDate: string, time?: string | null) {
   if (!time) return tripDate;
   const timePart = time.includes(" ") ? time.split(" ").at(-1) : time;
   return `${tripDate.replaceAll("-", "/")} ${timePart}`;
+}
+
+function formatTimelineHour(statDate: string, hour: number, includeDate: boolean) {
+  const hourLabel = `${String(hour).padStart(2, "0")}:00`;
+  if (!includeDate) return hourLabel;
+
+  const parts = String(statDate).split(/[-/]/);
+  if (parts.length >= 3) {
+    return `${parts[1]}/${parts[2]} ${hourLabel}`;
+  }
+  return `${statDate} ${hourLabel}`;
 }

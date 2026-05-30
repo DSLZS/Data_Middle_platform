@@ -6,13 +6,13 @@ const outputPath = join(".wrangler", "tmp", "d1-cache-seed.sql");
 
 const entries = [
   ["overview:v1", "/api/overview", 604800],
-  ["timeline:v1", "/api/timeline", 604800],
+  ["timeline:v2", "/api/timeline", 604800],
   ["hotspots:v1:5", "/api/hotspots?limit=5", 604800],
   ["hotspots:v1:12", "/api/hotspots?limit=12", 604800],
   ["congested-roads:v1:10", "/api/congested-roads?limit=10", 604800],
   ["road-classes:v1", "/api/road-classes", 604800],
-  ["trips:v1:8", "/api/trips?limit=8", 604800],
-  ["map-layers:v1", "/api/map-layers", 604800],
+  ["trips:v1:16", "/api/trips?limit=16", 604800],
+  ["map-layers:v2", "/api/map-layers", 604800],
 ];
 
 const now = Date.now();
