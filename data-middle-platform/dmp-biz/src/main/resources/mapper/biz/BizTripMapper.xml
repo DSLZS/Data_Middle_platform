@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dmp.biz.mapper.BizTripMapper">
+
+    <select id="getTaxiOdAggregatedLines" resultType="com.dmp.biz.domain.vo.TaxiOdFlylineVO">
+    <![CDATA[
+        SELECT CAST(AVG(O_lon) AS DECIMAL(18, 6)) AS startLon,
+               CAST(AVG(O_lat) AS DECIMAL(18, 6)) AS startLat,
+               CAST(AVG(D_lon) AS DECIMAL(18, 6)) AS endLon,
+               CAST(AVG(D_lat) AS DECIMAL(18, 6)) AS endLat,
+               COUNT(1)                           AS weight
+        FROM (SELECT CAST(lon ->>'$[0]' AS DECIMAL(18,6))                                               AS O_lon,
+                     CAST(lat ->>'$[0]' AS DECIMAL(18,6))                                               AS O_lat,
+                     CAST(JSON_EXTRACT(lon, CONCAT('$[', JSON_LENGTH(lon) - 1, ']')) AS DECIMAL(18, 6)) AS D_lon,
+                     CAST(JSON_EXTRACT(lat, CONCAT('$[', JSON_LENGTH(lat) - 1, ']')) AS DECIMAL(18, 6)) AS D_lat
+              FROM trips
+              WHERE created_at >= #{param1}
+                AND created_at <= #{param2}) AS od_data
+        WHERE O_lon IS NOT NULL
+          AND D_lon IS NOT NULL
+        GROUP BY ST_GeoHash(O_lon, O_lat, 6),
+                 ST_GeoHash(D_lon, D_lat, 6)
+        HAVING
+            -- 💡 修复：在 HAVING 的聚合函数外层，强制将 AVG 结果转为 DOUBLE
+            ST_GeoHash(CAST(AVG(O_lon) AS DOUBLE), CAST(AVG(O_lat) AS DOUBLE), 6) <>
+            ST_GeoHash(CAST(AVG(D_lon) AS DOUBLE), CAST(AVG(D_lat) AS DOUBLE), 6)
+        ORDER BY weight DESC
+            LIMIT #{param3}
+        ]]>
+</select>
+
+</mapper>

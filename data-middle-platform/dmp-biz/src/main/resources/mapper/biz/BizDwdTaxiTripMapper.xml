@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dmp.biz.mapper.BizDwdTaxiTripMapper">
+
+    <select id="getCommuteCorridors" resultType="com.dmp.biz.domain.vo.TaxiOdFlylineVO">
+        SELECT
+            ROUND(start_lon, 3) AS startLon, ROUND(start_lat, 3) AS startLat,
+            ROUND(end_lon, 3) AS endLon, ROUND(end_lat, 3) AS endLat
+--             COUNT(*) AS weight
+        FROM dwd_taxi_trip
+        WHERE start_time BETWEEN #{start} AND #{end}
+        GROUP BY startLon, startLat, endLon, endLat
+--         HAVING weight > 0
+    </select>
+
+    <select id="getNightEconomyHeatmap" resultType="com.dmp.biz.domain.vo.HeatPointVO">
+        SELECT
+            ROUND(end_lon, 3) AS lon, ROUND(end_lat, 3) AS lat,
+            COUNT(*) AS intensity
+        FROM dwd_taxi_trip
+        WHERE end_time BETWEEN #{start} AND #{end}
+        GROUP BY lon, lat
+        ORDER BY intensity DESC
+    </select>
+</mapper>

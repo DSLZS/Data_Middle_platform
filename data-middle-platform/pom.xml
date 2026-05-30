@@ -220,6 +220,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.dmp</groupId>
+                <artifactId>dmp-biz</artifactId>
+                <version>${dmp.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-devtools</artifactId>
                 <version>${spring-boot.version}</version>
@@ -236,6 +242,7 @@
         <module>dmp-quartz</module>
         <module>dmp-generator</module>
         <module>dmp-common</module>
+        <module>dmp-biz</module>
     </modules>
     <packaging>pom</packaging>
 
