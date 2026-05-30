@@ -104,15 +104,17 @@ export async function getOverview() {
   );
 }
 
-export async function getTimeline() {
+export async function getTimeline(limit = 24) {
+  const safeLimit = clampLimit(Number.isFinite(limit) ? limit : 24, 168);
+
   return resilient(
     () =>
-      cachedJson("timeline:v2", 600, async () => {
+      cachedJson(`timeline:v3:${safeLimit}`, 600, async () => {
         const rows = await queryRows<RoadTrafficRow>(`
           SELECT stat_date, stat_hour, total_roads, avg_congestion, congested_roads, smooth_roads, avg_speed_kmh
           FROM dws_road_traffic
           ORDER BY stat_date DESC, stat_hour DESC
-          LIMIT 24
+          LIMIT ${safeLimit}
         `);
         if (!rows.length) return fallbackTimeline;
 

@@ -128,7 +128,7 @@ export function TrafficDashboard() {
         roadClasses,
       ] = await Promise.all([
         fetchApi<Overview>("/api/overview"),
-        fetchApi<TimelinePoint[]>("/api/timeline"),
+        fetchApi<TimelinePoint[]>("/api/timeline?limit=48"),
         fetchApi<Hotspot[]>("/api/hotspots"),
         fetchApi<CongestedRoad[]>("/api/congested-roads"),
         fetchApi<Trip[]>("/api/trips?limit=16"),
@@ -232,8 +232,6 @@ export function TrafficDashboard() {
       })),
     [state.hotspots],
   );
-
-  const timelineTickInterval = Math.max(0, Math.ceil(state.timeline.length / 12) - 1);
 
   const metricCards = [
     {
@@ -342,7 +340,7 @@ export function TrafficDashboard() {
           </Panel>
         </section>
 
-        <Panel title="趋势图" icon={TrendingUp} action="最近24个小时点">
+        <Panel title="趋势图" icon={TrendingUp} action={`最近 ${state.timeline.length} 个小时点`}>
           <div className="h-[280px]">
             {mounted ? (
               <MeasuredChart>
@@ -355,7 +353,7 @@ export function TrafficDashboard() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid stroke="rgba(125, 211, 252, 0.08)" vertical={false} />
-                  <XAxis dataKey="hour" tick={{ fill: "#7dbbd0", fontSize: 12 }} interval={timelineTickInterval} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="hour" tick={{ fill: "#7dbbd0", fontSize: 12 }} interval={getTimelineTickInterval(state.timeline.length, width)} axisLine={false} tickLine={false} />
                   <YAxis hide />
                   <ChartTooltip content={<ChartTip />} />
                   <Area type="monotone" dataKey="activeVehicles" name="覆盖路段" stroke="#22e6f5" strokeWidth={3} fill="url(#trafficTrend)" dot={{ r: 4, fill: "#22e6f5" }} />
@@ -663,6 +661,11 @@ function ChartPlaceholder() {
   return (
     <div className="h-full w-full rounded-sm border border-cyan-400/10 bg-cyan-500/[0.03]" />
   );
+}
+
+function getTimelineTickInterval(pointCount: number, chartWidth: number) {
+  const maxTicks = Math.max(8, Math.floor(chartWidth / 56));
+  return Math.max(0, Math.ceil(pointCount / maxTicks) - 1);
 }
 
 function MeasuredChart({
