@@ -1,0 +1,11 @@
+import { NextResponse } from "next/server";
+
+import { getRoadClasses } from "@/lib/traffic/service";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+export async function GET() {
+  const result = await getRoadClasses();
+  return NextResponse.json({ success: true, ...result });
+}

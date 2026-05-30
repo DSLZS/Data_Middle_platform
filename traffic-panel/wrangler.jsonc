@@ -1,0 +1,36 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "traffic-panel-v2",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-05-30",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "traffic-panel-v2"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "TRAFFIC_CACHE",
+      "database_name": "traffic-panel-v2-cache",
+      "database_id": "b319a546-1703-443d-a4df-dc0fb0c28d66"
+    }
+  ],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "d51ccf79c0b543aeb3fb42a5fb2ec9f3"
+    }
+  ],
+  "vars": {
+    "NEXTJS_ENV": "production"
+  }
+}
