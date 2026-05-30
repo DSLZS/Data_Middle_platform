@@ -11,8 +11,9 @@ let pulseLineLayer = null
 let baseLineLayer = null
 
 const loading = ref(false)
-const targetDate = ref('2015-01-05')
-const peakType = ref('morning')
+const targetDate = ref('2015-01-03')
+const peakType = ref('evening')
+const weightLevel = ref(2)
 
 // 日期限制
 const disabledDate = (time) => {
@@ -37,11 +38,12 @@ const fetchDataAndRender = async () => {
   const endTime = `${targetDate.value} ${end}`
 
   try {
-    const res = await getOdFlylines(startTime, endTime)
+    const res = await getOdFlylines(startTime, endTime, weightLevel.value)
+
     const data = res.data || []
 
     if (data.length === 0) {
-      ElMessage.info(`${targetDate.value} 该时段暂无通勤数据`)
+      ElMessage.info(`${targetDate.value} 该时段暂无符合条件的通勤数据`)
       clearLayers()
       return
     }
@@ -87,10 +89,16 @@ const renderLocaFlylines = (rawData) => {
   pulseLineLayer = new window.Loca.PulseLineLayer({ loca, zIndex: 11 })
   pulseLineLayer.setSource(geoSource)
   pulseLineLayer.setStyle({
-    lineWidth: (_, feature) =>
-      Math.min(6, Math.max(1.5, feature.properties.weight / 10)),
-    color: (_, feature) =>
-      feature.properties.weight > 50 ? '#00ffff' : '#1e90ff',
+    lineWidth: (_, feature) => {
+      const w = feature.properties.weight
+      return w === 3 ? 6 : w === 2 ? 4 : 2
+    },
+    color: (_, feature) => {
+      const w = feature.properties.weight
+      if (w === 3) return '#ff4d4f'
+      if (w === 2) return '#faad14'
+      return '#1e90ff'
+    },
     headColor: 'rgba(255, 255, 255, 1)',
     trailColor: 'rgba(0, 255, 255, 0)',
     interval: 1.5,
@@ -151,6 +159,16 @@ onUnmounted(() => {
           <el-option label="早高峰" value="morning" />
           <el-option label="晚高峰" value="evening" />
         </el-select>
+
+        <el-select
+          v-model="weightLevel"
+          style="width: 110px; margin-right: 15px"
+        >
+          <el-option label="高频" :value="3" />
+          <el-option label="中频" :value="2" />
+          <el-option label="低频" :value="1" />
+        </el-select>
+
         <el-button type="primary" :loading="loading" @click="fetchDataAndRender"
           >执行分析</el-button
         >
@@ -173,6 +191,7 @@ onUnmounted(() => {
   align-items: center;
   background: #0c152a;
   color: #fff;
+  z-index: 10; /* 确保悬浮在地图上方 */
 }
 .map-container {
   flex: 1;

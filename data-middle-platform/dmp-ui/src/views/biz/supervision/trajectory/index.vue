@@ -303,18 +303,18 @@ onUnmounted(() => {
         <div class="mini-data-overlay">
           <div class="data-item">
             <span class="label">时间：</span>
-            <span class="value">{{ historyData.gpsTime }}</span>
+            <span class="value speed-val">{{ historyData.gpsTime }}</span>
           </div>
           <div class="data-item">
             <span class="label">经纬度：</span>
-            <span class="value"
+            <span class="value speed-val"
               >{{ historyData.lng }}, {{ historyData.lat }}</span
             >
           </div>
-          <div class="data-item">
-            <span class="label">当前车速：</span>
-            <span class="value speed-val">{{ historyData.speed }} km/h</span>
-          </div>
+<!--          <div class="data-item">-->
+<!--            <span class="label">当前车速：</span>-->
+<!--            <span class="value speed-val">{{ historyData.speed }} km/h</span>-->
+<!--          </div>-->
         </div>
       </el-col>
 

@@ -18,12 +18,19 @@ export function getTrajectory(tripId: number | string) {
 
 /**
  * 获取职住通勤飞线数据
+ * @param startTime 开始时间
+ * @param endTime 结束时间
+ * @param weightLevel 权重等级 (1:低, 2:中, 3:高)
  */
-export function getOdFlylines(startTime: string, endTime: string) {
+export function getOdFlylines(
+  startTime: string,
+  endTime: string,
+  weightLevel: number = 2
+) {
   return request({
     url: '/biz/decision/od',
     method: 'get',
-    params: { startTime, endTime },
+    params: { startTime, endTime, weightLevel },
   })
 }
 

@@ -102,11 +102,11 @@ public class BizTripServiceImpl extends ServiceImpl<BizTripMapper, BizTrip> impl
             Double lat = lats.get(i);
 
             if (lon == null || lat == null) {
-                continue; // 跳过当前循环，不加入集合
+                continue;
             }
 
             if (tms == null || i >= tms.size() || tms.get(i) == null || tms.get(i) <= 0) {
-                continue; // 丢弃这个没有时间的“幽灵点位”
+                continue;
             }
 
             TripPointVO vo = new TripPointVO();
@@ -127,31 +127,13 @@ public class BizTripServiceImpl extends ServiceImpl<BizTripMapper, BizTrip> impl
     }
 
     @Override
-    public List<TaxiOdFlylineVO> getCommuteCorridors(String startTime, String endTime) {
-
-        // 1. 定义时间格式化工具
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-        // 2. 将字符串转为 LocalDateTime
-        LocalDateTime start = LocalDateTime.parse(startTime, formatter);
-        LocalDateTime end = LocalDateTime.parse(endTime, formatter);
-
-        // 3. 执行偏移：开始时间 -2小时，结束时间 +2小时
-        LocalDateTime adjustedStart = start.minusHours(2);
-        LocalDateTime adjustedEnd = end.plusHours(2);
-
-        // 4. 转回字符串传给 Mapper (确保格式与数据库 datetime 一致)
-        String start1 = adjustedStart.format(formatter);
-        String end1 = adjustedEnd.format(formatter);
-        return bizDwdTaxiTripMapper.getCommuteCorridors(
-                start1,
-                end1
-        );
+    public List<TaxiOdFlylineVO> getCommuteCorridors(String startTime, String endTime, Integer weightLevel) {
+        return bizDwdTaxiTripMapper.getCommuteCorridors(startTime, endTime, weightLevel);
     }
 
     @Override
     public List<HeatPointVO> getNightEconomyHeatmap(String startTime, String endTime) {
-        startTime = "2015-01-03 13:00:00";
+        startTime = "2015-01-03 18:00:00";
         endTime = "2015-01-04 00:00:00";
         return bizDwdTaxiTripMapper.getNightEconomyHeatmap(startTime, endTime);
     }

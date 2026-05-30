@@ -10,7 +10,15 @@ let loca = null
 let heatLayer = null
 
 const loading = ref(false)
-const targetDate = ref('2015-01-05')
+const targetDate = ref('2015-01-03')
+
+// 新增：日期限制逻辑
+const disabledDate = (time) => {
+  const start = new Date('2014-12-31').getTime()
+  const end = new Date('2015-01-05').getTime()
+  const currentTime = time.getTime()
+  return currentTime < start || currentTime > end
+}
 
 // 获取数据逻辑
 const fetchDataAndRender = async () => {
@@ -115,6 +123,7 @@ onUnmounted(() => {
           v-model="targetDate"
           type="date"
           value-format="YYYY-MM-DD"
+          :disabled-date="disabledDate"
           style="width: 160px; margin-right: 10px"
         />
         <el-button type="primary" :loading="loading" @click="fetchDataAndRender"
@@ -139,6 +148,7 @@ onUnmounted(() => {
   align-items: center;
   background: #0c152a;
   color: #fff;
+  z-index: 10;
 }
 .map-container {
   flex: 1;

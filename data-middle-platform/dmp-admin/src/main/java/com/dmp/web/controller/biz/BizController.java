@@ -34,8 +34,11 @@ public class BizController {
     }
 
     @GetMapping("/decision/od")
-    public AjaxResult getOdFlylines(@RequestParam String startTime, @RequestParam String endTime) {
-        return AjaxResult.success(bizTripService.getCommuteCorridors(startTime, endTime));
+    public AjaxResult getOdFlylines(
+            @RequestParam("startTime") String startTime,
+            @RequestParam("endTime") String endTime,
+            @RequestParam(value = "weightLevel", required = false, defaultValue = "2") Integer weightLevel) {
+        return AjaxResult.success(bizTripService.getCommuteCorridors(startTime, endTime, weightLevel));
     }
 
     @GetMapping("/decision/night")

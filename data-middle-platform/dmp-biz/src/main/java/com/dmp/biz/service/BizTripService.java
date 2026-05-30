@@ -15,7 +15,7 @@ public interface BizTripService extends IService<BizTrip> {
 
     public List<TripSummaryVO> getTripSummary(String devId);
 
-    List<TaxiOdFlylineVO> getCommuteCorridors(String startTime, String endTime);
+    List<TaxiOdFlylineVO> getCommuteCorridors(String startTime, String endTime, Integer weightLevel);
 
     public List<HeatPointVO> getNightEconomyHeatmap(String startTime, String endTime);
 }
